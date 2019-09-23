@@ -5,10 +5,10 @@ from openpyxl import Workbook
 from TorqueLog import TorqueLogFormat
 from TorqueEvent import TorqueEventFormat
 
-write_path_prefix = "E:/11 Python_WorkSpace/log_json"
-root_path = 'E:/11 Python_WorkSpace/log_test'
+write_path_prefix = "./log_json"
+root_path = './logs'
 # root_path = 'E:/11 Python_WorkSpace/log'
-excel_name = "E:/11 Python_WorkSpace/result_2019.xlsx"
+excel_name = "./result_2019.xlsx"
 
 
 # 获取文件夹下的文件列表
