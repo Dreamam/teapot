@@ -1,7 +1,7 @@
 # coding:utf-8
 
 
-class TorqueLogFormat:  # Torque日志基本格式实体类
+class TorqueLogFormat(object):  # Torque日志基本格式实体类
     # 时间戳
     time_stamp = 0
 

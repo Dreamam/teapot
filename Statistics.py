@@ -1,9 +1,12 @@
 # coding:utf-8
 import os
 import json
+import pymysql
 from openpyxl import Workbook
-from TorqueLog import TorqueLogFormat
-from TorqueEvent import TorqueEventFormat
+from model.TorqueLog import TorqueLogFormat
+from model.TorqueEvent import TorqueEventFormat
+from sql.SqlConfigParser import SqlConfigParser
+from sql.SqlConnector import SqlConnector
 
 write_path_prefix = "./log_json"
 root_path = './logs'
@@ -68,11 +71,22 @@ def read_file_list(root_path, file_list):
                 for line in log_file:
                     # eachline = log_file.readline()
                     # print ("status: " + get_job_status(line) )
+                    conn = SqlConnector()
                     torque_log_format = TorqueLogFormat(line)
+                    sql = """
+                    INSERT INTO t_log ( event_marker, job_num, event_detail )
+                       VALUES ( %s, %s, %s);
+                    """
+                    # 执行SQL语句
+                    conn.execute(sql, (
+                        torque_log_format.event_marker, torque_log_format.job_num, torque_log_format.event_detail))
+
                     if 'E' == torque_log_format.event_marker:
                         torque_event_format = TorqueEventFormat(torque_log_format.event_detail)
                         # print(file_list[i] + " " + "Status: " + torque_log.event_marker + " needppn: " + str(torque_event_format.Resource_List_need_ppn) + " jobName: " + torque_event_format.job_name)
                         torque_event_list.append(torque_event_format)
+                # 关闭连接
+                # conn.close()
     return torque_event_list
 
     ######################################################################
@@ -110,7 +124,7 @@ def create_excel(filename, sheet_name, event_list):
     attr_list = get_class_attr(TorqueEventFormat)
     for i in range(len(attr_list)):
         # worksheet.write(0, i, attr_list[i])
-        worksheet.cell(row=1, column=i+1).value = attr_list[i]
+        worksheet.cell(row=1, column=i + 1).value = attr_list[i]
     # workbook.save(excel_name)
     # 写入统计数据
     for i in range(len(event_list)):
@@ -130,3 +144,8 @@ log_file_list = get_file_list(root_path)
 torque_event_list = read_file_list(root_path, log_file_list)
 create_excel(excel_name, 'sheet 1', torque_event_list)
 # print(get_class_attr(TorqueEventFormat))
+iniParser = SqlConfigParser()
+print(iniParser.host)
+print(iniParser.user)
+print(iniParser.password)
+print(iniParser.charset)
